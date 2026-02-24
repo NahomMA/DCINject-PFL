@@ -31,7 +31,7 @@ def time_experiment(func):
 def setup_dcinject_attack(clients, server, target_label, poison_ratio,attack_budget,noise_pattern, trigger_type="frequency"):   
     trigger = DCINJECTTrigger(server.global_model.device, attack_budget=attack_budget, noise_pattern=noise_pattern)
 
-    def msba_poison_func(data, label, target_label=target_label, poison_ratio=poison_ratio):
+    def dcinject_poison_func(data, label, target_label=target_label, poison_ratio=poison_ratio):
         if trigger_type == "frequency":
             return trigger.apply_trigger_batch_frequency(data, label, target_label, poison_ratio)
         elif trigger_type == "adaptive_frequency":
@@ -41,10 +41,10 @@ def setup_dcinject_attack(clients, server, target_label, poison_ratio,attack_bud
 
     for client in clients:
         if "Poison" in type(client).__name__:
-            client.poison_func = partial(msba_poison_func, 
+            client.poison_func = partial(dcinject_poison_func, 
                                        target_label=target_label, 
                                        poison_ratio=poison_ratio)
-            eval_func = partial(msba_poison_func, 
+            eval_func = partial(dcinject_poison_func, 
                               target_label=target_label, 
                               poison_ratio=1.0)
     
@@ -73,6 +73,8 @@ def load_argument():
     parser.add_argument("--no_defense", action="store_true", help="Disable defense (overrides --defense)")
     parser.add_argument("--defense_rounds", type=int, default=3, help="Number of defense rounds")
     parser.add_argument("--defense_lr", type=float, default=0.001, help="Defense learning rate")
+    parser.add_argument("--attack_type", type=str, default=None, help="Specify the attack to run")
+    parser.add_argument("--trigger_type", type=str, default=None, help="Specify trigger type for  the attack")
     return parser.parse_args()
 
 def load_dataset(dataset_name):
@@ -185,8 +187,8 @@ def run_experiment(args, attack_type, clients, num_classes, device, trigger_type
                     training_rounds=args.total_round,
                     select_rule=partial(random_select, nums=args.select_client_num_per_round))
     
-    # # Save models and images for MSBA attacks
-    # if attack_type == "msba":
+    # # Save models and images for DCInject attacks
+    # if attack_type == "dcinject":
     #     save_models_and_images(clients, poison_func, trigger_type or "spatial")
     
     # # Print header for results table
@@ -262,6 +264,7 @@ def save_models_and_images(clients, poison_func, trigger_type):
 #     def_acc_tensor, def_asr_tensor = torch.tensor(defended_accs), torch.tensor(defended_asrs)
 #     return def_acc_tensor.mean().item(), def_acc_tensor.std().item(), def_asr_tensor.mean().item(), def_asr_tensor.std().item()
 
+
 def print_results(results, defense_enabled=False):
     print("\nFinal Summary:")
     print("=" * 100)
@@ -293,17 +296,22 @@ if __name__ == "__main__":
     device = torch.device("cpu" if args.device == "cpu" else f"cuda:{args.device}")
     set_random_seed(args.seed)
     
-    datasets = ["gtsrb", "cifar10", "cifar100", "svhn"]
-    # datasets = ["cifar10"]
-    attack_configs = [                
-                ("msba", "frequency"),
-                 ("msba", "adaptive_frequency"),
-                ("Badpfl", None),
-                ("Badnet", None),         
-                ("msba", "spatial")
-    ]
-    attack_names = ["MSBA_freq","MSBA_adap_freq","Badpfl", "Badnet", "MSBA_sp"]
-    # attack_names = ["MSBA_freq","MSBA_adap_freq"]
+    if args.dataset:
+        datasets = [args.dataset.lower()]
+    else:
+        datasets = ["gtsrb", "cifar10", "cifar100", "svhn"]
+
+    if args.attack_type:
+        attack_configs = [(args.attack_type.lower(), args.trigger_type)]
+        attack_names = [f"{args.attack_type.capitalize()}_{args.trigger_type or 'none'}"]
+    else:
+        attack_configs = [
+            ("dcinject", "frequency"),
+            ("dcinject", "adaptive_frequency"),
+            ("Badpfl", None),
+            ("Badnet", None)
+        ]
+        attack_names = ["DCInject_freq", "DCInject_adap_freq"]
     
     results = {}
     

@@ -19,7 +19,7 @@ CONFIG = {
     "pfl": "fedbn",
     "agg_rule": "avg",
     
-    "attack_type": "msba",  
+    "attack_type": "dcinject",  
     "target_label": 0,
     "poison_ratio": 0.2,
     "attack_budget": 0.03,

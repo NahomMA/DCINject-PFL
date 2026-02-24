@@ -26,11 +26,11 @@ config = {
     
 
     #federated learning settings
-    "fba": "msba",    
+    # "fba": "dcinject",    
 
 
     #attack settings
-    "attack_type": "msba",
+    "attack_type": "dcinject",
     "target_label": 0,
     "poison_ratio": 0.2,
     "attack_budget": 0.3,
