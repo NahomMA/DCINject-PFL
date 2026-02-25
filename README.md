@@ -20,17 +20,8 @@ conda environment and install dependencies as you encounter missing packages:
 ```bash
 conda create -n dcinject-gpu python=3.9
 conda activate dcinject-gpu
-conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+pip install -r dcinject_requirements.txt
 ```
-
-
-
-When you run the script and encounter missing package errors, install them as needed:
-```bash
-pip install <package-name>
-```
-
-
 
 ## Methodology
 
@@ -38,48 +29,24 @@ The core innovation of DCInject is manipulation in the frequency domain. The att
 
 1. Converting input images to the frequency domain using FFT
 2. Identifying and removing portions of the DC (zero-frequency) component
-3. Replacing removed portions with Gaussian-distributed noise
+3. Replacing removed portions with Gaussian-distributed noise sample
 4. Converting back to spatial domain
 
 ![Block Diagram](assets/Block-diagram.png)
 
 ## Usage
 
-Run DCInject attack on CIFAR-10:
+Run DCInject attack on CIFAR-10 with defualt configs:
 
 ```bash
-python dcinject.py --dataset CIFAR10 --attack_type dcinject --poison_ratio 0.2 \
-    --attack_budget 0.03 --trigger_type frequency
+python dcinject.py --dataset CIFAR10
 ```
 
-### Key Arguments
+## Results: Attack Success Rate and ACC
 
-- `--dataset`: Dataset name (cifar10, cifar100, gtsrb, svhn)
-- `--trigger_type`: Trigger domain (frequency, adaptive_frequency)
-- `--poison_ratio`: Poison data ratio (default: 0.2)
-- `--attack_budget`: Attack budget (default: 0.03)
-- `--client_num`: Number of clients (default: 100)
-- `--bad_client_num`: Number of malicious clients (default: 10)
+![Expected Result](assets/expected_result.png)
 
-## Results
 
-### Attack Success Rate (Before Defense)
-
-DCInject achieves significantly higher attack success rates across multiple datasets compared to baseline attacks:
-
-![ASR Before Defense](assets/asr_before_fefense.png)
-
-### Robustness Under Defense
-
-Evaluation under I-BAU defense shows DCInject's superior persistence:
-
-![Results After Defense](assets/after_defense.png)
-
-### Ablation Study
-
-The impact of different design choices in DCInject:
-
-![Ablation Study](assets/ablation.png)
 
 ## Citation
 
