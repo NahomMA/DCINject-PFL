@@ -53,7 +53,6 @@ checkpoints/
 # Logs and debugging
 
 defense_logs/
-*.png
 logs/
 *.log
 .DS_Store
