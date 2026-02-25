@@ -9,12 +9,12 @@ Personalized federated learning (PFL) creates client-specific models to handle d
 ## Requirements
 
 - Python 3.9+
-- PyTorch (GPU or CPU)
+- PyTorch (GPU)
 - numpy, torchvision, pillow (install as needed)
 
 ## Installation
 
-Create a minimal conda environment and install dependencies as you encounter missing packages:
+conda environment and install dependencies as you encounter missing packages:
 
 **GPU Setup:**
 ```bash
@@ -23,22 +23,14 @@ conda activate dcinject-gpu
 conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 ```
 
-**CPU Setup:**
-```bash
-conda create -n dcinject-cpu python=3.9
-conda activate dcinject-cpu
-conda install pytorch torchvision torchaudio cpuonly -c pytorch
-```
+
 
 When you run the script and encounter missing package errors, install them as needed:
 ```bash
 pip install <package-name>
 ```
 
-Once you've run experiments successfully, export the final dependencies:
-```bash
-pip freeze > dcinject_requirements.txt
-```
+
 
 ## Methodology
 

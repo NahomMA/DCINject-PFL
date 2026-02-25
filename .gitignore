@@ -98,3 +98,4 @@ Separate_test.py
 *.sh
 *.text
 *.txt
+dcinject.sh
